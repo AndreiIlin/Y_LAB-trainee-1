@@ -32,6 +32,7 @@ function Input(props) {
       type={props.type}
       placeholder={props.placeholder}
       onChange={onChange}
+      {...props}
     />
   )
 }

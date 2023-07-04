@@ -22,5 +22,9 @@
   "auth.password": "Пароль",
   "auth.signIn": "Войти",
   "session.signIn": "Вход",
-  "session.signOut": "Выход"
+  "session.signOut": "Выход",
+  "modals/addToBasket.title": "Добавление в корзину",
+  "modals/addToBasket.count": "Количество товара, добавляемого в корзину",
+  "modals/addToBasket.cancel": "Отмена",
+  "modals/addToBasket.confirm": "Ок"
 }

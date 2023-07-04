@@ -2,9 +2,10 @@ export default {
   /**
    * Открытие модалки по названию
    * @param name
+   * @param data
    */
-  open: (name) => {
-    return {type: 'modal/open', payload: {name}};
+  open: ({ name, data }) => {
+    return {type: 'modal/open', payload: {name, data}};
   },
 
   /**

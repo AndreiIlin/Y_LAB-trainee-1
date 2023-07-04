@@ -1,14 +1,18 @@
-import {memo, useCallback} from "react";
-import useStore from "@src/hooks/use-store";
-import useSelector from "@src/hooks/use-selector";
-import useTranslate from "@src/hooks/use-translate";
-import Item from "@src/components/item";
-import List from "@src/components/list";
-import Pagination from "@src/components/pagination";
-import Spinner from "@src/components/spinner";
+import { memo, useCallback } from 'react';
+import useStore from '@src/hooks/use-store';
+import useSelector from '@src/hooks/use-selector';
+import useTranslate from '@src/hooks/use-translate';
+import Item from '@src/components/item';
+import List from '@src/components/list';
+import Pagination from '@src/components/pagination';
+import Spinner from '@src/components/spinner';
+import modalsActions from '@src/store-redux/modals/actions.js';
+import { useDispatch } from 'react-redux';
 
 function CatalogList() {
   const store = useStore();
+  const dispatch = useDispatch();
+  const { t } = useTranslate();
 
   const select = useSelector(state => ({
     list: state.catalog.list,
@@ -19,29 +23,61 @@ function CatalogList() {
   }));
 
   const callbacks = {
+    // Закрытие модального окна
+    closeModal: useCallback(() => {
+      dispatch(modalsActions.close());
+    }, []),
     // Добавление в корзину
-    addToBasket: useCallback(_id => store.actions.basket.addToBasket(_id), [store]),
+    addToBasket: useCallback((_id, count) => {
+      callbacks.closeModal();
+      if (!count) {
+        return;
+      }
+      store.actions.basket.addToBasket(_id, count);
+    }, [store]),
+    // Открытие модального окна добавления товаров
+    addToBasketModalOpen: useCallback((_id) => () => {
+      dispatch(modalsActions.open({
+        name: 'add to basket',
+        data: {
+          _id,
+          title: t('modals/addToBasket.title'),
+          label: t('modals/addToBasket.count'),
+          labelClose: t('modals/addToBasket.cancel'),
+          onClose: callbacks.closeModal,
+          onConfirm: callbacks.addToBasket,
+        },
+      }));
+    }, [t]),
     // Пагинация
-    onPaginate: useCallback(page => store.actions.catalog.setParams({page}), [store]),
+    onPaginate: useCallback(page => store.actions.catalog.setParams({ page }), [store]),
     // генератор ссылки для пагинатора
     makePaginatorLink: useCallback((page) => {
-      return `?${new URLSearchParams({page, limit: select.limit, sort: select.sort, query: select.query})}`;
-    }, [select.limit, select.sort, select.query])
-  }
+      return `?${new URLSearchParams({
+        page,
+        limit: select.limit,
+        sort: select.sort,
+        query: select.query,
+      })}`;
+    }, [select.limit, select.sort, select.query]),
+  };
 
-  const {t} = useTranslate();
 
   const renders = {
     item: useCallback(item => (
-      <Item item={item} onAdd={callbacks.addToBasket} link={`/articles/${item._id}`} labelAdd={t('article.add')}/>
-    ), [callbacks.addToBasket, t]),
+      <Item
+        item={item} onAdd={callbacks.addToBasketModalOpen(item._id)} link={`/articles/${item._id}`} labelAdd={t('article.add')}
+      />
+    ), [callbacks.addToBasketModalOpen, t]),
   };
 
   return (
     <Spinner active={select.waiting}>
-      <List list={select.list} renderItem={renders.item}/>
-      <Pagination count={select.count} page={select.page} limit={select.limit}
-                  onChange={callbacks.onPaginate} makeLink={callbacks.makePaginatorLink}/>
+      <List list={select.list} renderItem={renders.item} />
+      <Pagination
+        count={select.count} page={select.page} limit={select.limit}
+        onChange={callbacks.onPaginate} makeLink={callbacks.makePaginatorLink}
+      />
     </Spinner>
   );
 }
