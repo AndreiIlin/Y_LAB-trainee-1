@@ -1,17 +1,17 @@
 import { memo, useCallback } from 'react';
-import { useDispatch } from 'react-redux';
 import useStore from '@src/hooks/use-store';
 import useSelector from '@src/hooks/use-selector';
 import useTranslate from '@src/hooks/use-translate';
 import ItemBasket from '@src/components/item-basket';
 import List from '@src/components/list';
 import BasketTotal from '@src/components/basket-total';
-import modalsActions from '@src/store-redux/modals/actions';
+import SideLayout from '@src/components/side-layout/index.js';
 
 function Basket() {
 
   const store = useStore();
-  const dispatch = useDispatch();
+
+  const { t } = useTranslate();
 
   const select = useSelector(state => ({
     list: state.basket.list,
@@ -22,19 +22,36 @@ function Basket() {
   const callbacks = {
     // Удаление из корзины
     removeFromBasket: useCallback(_id => store.actions.basket.removeFromBasket(_id), [store]),
-    // Закрытие любой модалки
+    // Закрытие модалки корзины
     closeModal: useCallback(() => {
-      //store.actions.modals.close();
-      dispatch(modalsActions.close());
+      store.actions.modals.close('basket');
     }, [store]),
+    // Открытие модалки каталога
+    openCatalogModal: useCallback(() => {
+      store.actions.modals.open({
+        name: 'catalog',
+        data: {
+          title: t('title'),
+          labelClose: t('basket.close'),
+          onClose: () => store.actions.modals.close('catalog'),
+          onConfirm: (items) => {
+            if (!items.length) {
+              return;
+            }
+            store.actions.modals.close('add to basket');
+            store.actions.modals.close('catalog');
+            store.actions.basket.addToBasket(items)
+          },
+        }
+      })
+    }, [t]),
   };
-
-  const { t } = useTranslate();
 
   const renders = {
     itemBasket: useCallback((item) => (
       <ItemBasket
         item={item}
+        amount={item.amount}
         link={`/articles/${item._id}`}
         onRemove={callbacks.removeFromBasket}
         onLink={callbacks.closeModal}
@@ -48,6 +65,9 @@ function Basket() {
     <>
       <List list={select.list} renderItem={renders.itemBasket} />
       <BasketTotal sum={select.sum} t={t} />
+      <SideLayout side={'start'} padding={'small'}>
+        <button onClick={callbacks.openCatalogModal}>{t('basket.addMore')}</button>
+      </SideLayout>
     </>
   );
 }

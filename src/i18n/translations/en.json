@@ -13,6 +13,7 @@
     "one": "article",
     "other": "articles"
   },
+  "basket.addMore": "Choose another article",
   "article.add": "Add",
   "filter.reset": "Reset",
   "auth.title": "Sign In",
@@ -22,7 +23,8 @@
   "session.signIn": "Sign In",
   "session.signOut": "Sign Out",
   "modals/addToBasket.title": "Adding to cart",
-  "modals/addToBasket.count": "The quantity of items to be added to cart",
+  "modals/addToBasket.count.first": "The quantity of article ",
+  "modals/addToBasket.count.last": " to be added to cart",
   "modals/addToBasket.cancel": "Cancel",
   "modals/addToBasket.confirm": "Ok"
 }

@@ -6,8 +6,7 @@ import Article from './article';
 import Login from './login';
 import Profile from './profile';
 import Protected from '@src/containers/protected';
-import { useSelector as useSelectorRedux } from 'react-redux';
-import Modal from '@src/containers/modal';
+import Modals from '@src/app/modals/index.js';
 
 /**
  * Приложение
@@ -20,8 +19,6 @@ function App() {
     await store.actions.session.remind();
   });
 
-  const activeModal = useSelectorRedux(state => state.modals.name);
-
   return (
     <>
       <Routes>
@@ -30,7 +27,7 @@ function App() {
         <Route path={'/login'} element={<Login />} />
         <Route path={'/profile'} element={<Protected redirect="/login"><Profile /></Protected>} />
       </Routes>
-      <Modal />
+      <Modals />
     </>
   );
 }

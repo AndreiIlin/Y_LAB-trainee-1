@@ -9,17 +9,22 @@ import CatalogFilter from "@src/containers/catalog-filter";
 import CatalogList from "@src/containers/catalog-list";
 import LocaleSelect from "@src/containers/locale-select";
 import TopHead from "@src/containers/top-head";
+import useSelector from '@src/hooks/use-selector.js';
 
 function Main() {
 
   const store = useStore();
+
+  const select = useSelector(state => ({
+    modals: state.modals.openedModals,
+  }))
 
   useInit(async () => {
     await Promise.all([
       store.actions.catalog.initParams(),
       store.actions.categories.load()
     ]);
-  }, [], true);
+  }, [select.modals], true);
 
   const {t} = useTranslate();
 

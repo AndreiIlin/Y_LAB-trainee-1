@@ -1,19 +1,35 @@
-import StoreModule from "../module";
+import StoreModule from '../module';
 
 class ModalsState extends StoreModule {
 
   initState() {
     return {
-      name: null
-    }
+      openedModals: [],
+    };
   }
 
-  open(name){
-    this.setState({name}, `Открытие модалки ${name}`);
+  open({
+    name,
+    data,
+  }) {
+    this.setState({
+      openedModals: [...this.getState().openedModals, {
+        name,
+        data,
+      }],
+    }, `Открытие модалки ${name}`);
   }
 
-  close(){
-    this.setState({name: null}, `Закрытие модалки`);
+  close(name) {
+    this.setState({
+      openedModals: this.getState().openedModals.filter(modal => modal.name !== name),
+    }, `Закрытие модалки ${name}`);
+  }
+
+  closeAll() {
+    this.setState({
+      openedModals: [],
+    }, 'Закрытие всех модалок');
   }
 }
 

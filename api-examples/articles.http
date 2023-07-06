@@ -14,6 +14,10 @@ GET http://example.front.ylab.io/api/v1/articles?limit=10&skip=20
 GET http://example.front.ylab.io/api/v1/articles?limit=10&skip=10&fields=items(_id, title, price),count
 
 ###
+# Список товаров по их id
+GET http://example.front.ylab.io/api/v1/articles?search[ids]=64845d45f4686f573a2287c6|64845d45f4686f573a2287c7
+
+###
 # Товар по id
 
 GET http://example.front.ylab.io/api/v1/articles/646b6e1fe1626c0bd8518064

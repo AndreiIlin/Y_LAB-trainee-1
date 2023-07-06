@@ -1,5 +1,5 @@
-import StoreModule from "../module";
-import exclude from "@src/utils/exclude";
+import StoreModule from '../module';
+import exclude from '@src/utils/exclude';
 
 /**
  * Состояние каталога - параметры фильтра исписок товара
@@ -18,20 +18,21 @@ class CatalogState extends StoreModule {
         limit: 10,
         sort: 'order',
         query: '',
-        category: ''
+        category: '',
       },
       count: 0,
-      waiting: false
-    }
+      waiting: false,
+    };
   }
 
   /**
    * Инициализация параметров.
    * Восстановление из адреса
    * @param [newParams] {Object} Новые параметры
+   * @param [isModal] {Boolean} Флаг, указывающий, что действие идет из модального окна
    * @return {Promise<void>}
    */
-  async initParams(newParams = {}) {
+  async initParams(newParams = {}, isModal = false) {
     const urlParams = new URLSearchParams(window.location.search);
     let validParams = {};
     if (urlParams.has('page')) validParams.page = Number(urlParams.get('page')) || 1;
@@ -39,7 +40,7 @@ class CatalogState extends StoreModule {
     if (urlParams.has('sort')) validParams.sort = urlParams.get('sort');
     if (urlParams.has('query')) validParams.query = urlParams.get('query');
     if (urlParams.has('category')) validParams.category = urlParams.get('category');
-    await this.setParams({...this.initState().params, ...validParams, ...newParams}, true);
+    await this.setParams({ ...this.initState().params, ...validParams, ...newParams }, true, isModal);
   }
 
   /**
@@ -49,7 +50,7 @@ class CatalogState extends StoreModule {
    */
   async resetParams(newParams = {}) {
     // Итоговые параметры из начальных, из URL и из переданных явно
-    const params = {...this.initState().params, ...newParams};
+    const params = { ...this.initState().params, ...newParams };
     // Установка параметров и загрузка данных
     await this.setParams(params);
   }
@@ -58,25 +59,29 @@ class CatalogState extends StoreModule {
    * Установка параметров и загрузка списка товаров
    * @param [newParams] {Object} Новые параметры
    * @param [replaceHistory] {Boolean} Заменить адрес (true) или новая запись в истории браузера (false)
+   * @param [isModal] {Boolean} Флаг, указывающий, что действие идет из модального окна
    * @returns {Promise<void>}
    */
-  async setParams(newParams = {}, replaceHistory = false) {
-    const params = {...this.getState().params, ...newParams};
+  async setParams(newParams = {}, replaceHistory = false, isModal = false) {
+    const params = { ...this.getState().params, ...newParams };
 
     // Установка новых параметров и признака загрузки
     this.setState({
       ...this.getState(),
       params,
-      waiting: true
+      waiting: true,
     }, 'Установлены параметры каталога');
 
-    // Сохранить параметры в адрес страницы
-    let urlSearch = new URLSearchParams(exclude(params, this.initState().params)).toString();
-    const url = window.location.pathname + (urlSearch ? `?${urlSearch}`: '') + window.location.hash;
-    if (replaceHistory) {
-      window.history.replaceState({}, '', url);
-    } else {
-      window.history.pushState({}, '', url);
+    if (!isModal) {
+      console.log('this happen');
+      // Сохранить параметры в адрес страницы
+      let urlSearch = new URLSearchParams(exclude(params, this.initState().params)).toString();
+      const url = window.location.pathname + (urlSearch ? `?${urlSearch}` : '') + window.location.hash;
+      if (replaceHistory) {
+        window.history.replaceState({}, '', url);
+      } else {
+        window.history.pushState({}, '', url);
+      }
     }
 
     const apiParams = exclude({
@@ -85,19 +90,19 @@ class CatalogState extends StoreModule {
       fields: 'items(*),count',
       sort: params.sort,
       'search[query]': params.query,
-      'search[category]': params.category
+      'search[category]': params.category,
     }, {
       skip: 0,
       'search[query]': '',
-      'search[category]': ''
+      'search[category]': '',
     });
 
-    const res = await this.services.api.request({url: `/api/v1/articles?${new URLSearchParams(apiParams)}`});
+    const res = await this.services.api.request({ url: `/api/v1/articles?${new URLSearchParams(apiParams)}` });
     this.setState({
       ...this.getState(),
       list: res.data.result.items,
       count: res.data.result.count,
-      waiting: false
+      waiting: false,
     }, 'Загружен список товаров из АПИ');
   }
 }

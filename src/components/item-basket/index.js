@@ -24,7 +24,7 @@ function ItemBasket(props) {
       </div>
       <div className={cn('right')}>
         <div className={cn('cell')}>{numberFormat(props.item.price)} {props.labelCurr}</div>
-        <div className={cn('cell')}>{numberFormat(props.item.amount || 0)} {props.labelUnit}</div>
+        <div className={cn('cell')}>{numberFormat(props.amount || 0)} {props.labelUnit}</div>
         <div className={cn('cell')}><button onClick={callbacks.onRemove}>{props.labelDelete}</button></div>
       </div>
     </div>
@@ -44,6 +44,7 @@ ItemBasket.propTypes = {
   labelCurr: PropTypes.string,
   labelDelete: PropTypes.string,
   labelUnit: PropTypes.string,
+  amount: PropTypes.number,
 }
 
 ItemBasket.defaultProps = {

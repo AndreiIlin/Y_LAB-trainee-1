@@ -8,6 +8,15 @@
   align-items: center;
 }
 
+.SideLayout_direction_row {
+  flex-direction: row;
+}
+
+.SideLayout_direction_column {
+  flex-direction: column;
+  align-items: start;
+}
+
 .SideLayout_side_start {
   justify-content: flex-start;
 }
