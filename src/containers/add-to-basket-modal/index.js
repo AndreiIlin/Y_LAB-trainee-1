@@ -3,19 +3,12 @@ import Field from '@src/components/field/index.js';
 import Input from '@src/components/input/index.js';
 import useTranslate from '@src/hooks/use-translate.js';
 import ButtonsGroup from '@src/components/buttons-group/index.js';
-import useSelector from '@src/hooks/use-selector.js';
 import SideLayout from '@src/components/side-layout/index.js';
 
-function AddToBasketModal() {
+function AddToBasketModal({ modalData }) {
   const { t } = useTranslate();
 
-  const select = useSelector(state => ({
-    openedModals: state.modals.openedModals,
-  }));
-
-  const currentModalData = select.openedModals.at(-1).data;
-
-  const [articles, setArticles] = useState(currentModalData.items.map(item => ({
+  const [articles, setArticles] = useState(modalData.items.map(item => ({
     ...item,
     count: '0',
   })));
@@ -35,22 +28,19 @@ function AddToBasketModal() {
   };
 
   const handleConfirm = () => {
-    currentModalData.onConfirm(articles);
+    modalData.onClose(articles);
   };
 
   return (
     <SideLayout side={'start'} padding={'small'} direction={'column'}>
-      {currentModalData.items.map(item => {
-        const currItem = articles.find(article => article._id === item._id);
-        return (
-          <Field key={item._id} label={`${currentModalData.labelFirst}${item.title}${currentModalData.labelLast}`}>
-            <Input name={item._id} type={'number'} value={currItem.count} min={0} onChange={callbacks.inputHandle} />
-          </Field>
-        );
-      })}
+      {articles.map(item => (
+        <Field key={item._id} label={`${modalData.labelFirst}${item.title}${modalData.labelLast}`}>
+          <Input name={item._id} type={'number'} value={item.count} min={0} onChange={callbacks.inputHandle} />
+        </Field>
+      ))}
       <ButtonsGroup>
         <button onClick={handleConfirm}>{t('modals/addToBasket.confirm')}</button>
-        <button onClick={currentModalData.onClose}>{t('modals/addToBasket.cancel')}</button>
+        <button onClick={modalData.onClose}>{t('modals/addToBasket.cancel')}</button>
       </ButtonsGroup>
     </SideLayout>
   );

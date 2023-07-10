@@ -5,6 +5,7 @@ class ModalsState extends StoreModule {
   initState() {
     return {
       openedModals: [],
+      lastModalId: 1,
     };
   }
 
@@ -12,24 +13,30 @@ class ModalsState extends StoreModule {
     name,
     data,
   }) {
-    this.setState({
-      openedModals: [...this.getState().openedModals, {
-        name,
-        data,
-      }],
-    }, `Открытие модалки ${name}`);
+    return new Promise((res, rej) => {
+      const id = this.getState().lastModalId;
+      this.setState({
+        openedModals: [...this.getState().openedModals, {
+          id,
+          name,
+          data: {
+            ...data,
+            onClose: (result) => {
+              res(result);
+              this.close(id);
+            },
+          },
+        }],
+        lastModalId: id + 1,
+      }, `Открытие модалки ${name}`);
+    });
   }
 
-  close(name) {
+  close(id) {
     this.setState({
-      openedModals: this.getState().openedModals.filter(modal => modal.name !== name),
-    }, `Закрытие модалки ${name}`);
-  }
-
-  closeAll() {
-    this.setState({
-      openedModals: [],
-    }, 'Закрытие всех модалок');
+      ...this.getState(),
+      openedModals: this.getState().openedModals.filter(modal => modal.id !== id),
+    }, `Закрытие модалки`);
   }
 }
 

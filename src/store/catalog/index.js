@@ -29,10 +29,9 @@ class CatalogState extends StoreModule {
    * Инициализация параметров.
    * Восстановление из адреса
    * @param [newParams] {Object} Новые параметры
-   * @param [isModal] {Boolean} Флаг, указывающий, что действие идет из модального окна
    * @return {Promise<void>}
    */
-  async initParams(newParams = {}, isModal = false) {
+  async initParams(newParams = {}) {
     const urlParams = new URLSearchParams(window.location.search);
     let validParams = {};
     if (urlParams.has('page')) validParams.page = Number(urlParams.get('page')) || 1;
@@ -40,7 +39,7 @@ class CatalogState extends StoreModule {
     if (urlParams.has('sort')) validParams.sort = urlParams.get('sort');
     if (urlParams.has('query')) validParams.query = urlParams.get('query');
     if (urlParams.has('category')) validParams.category = urlParams.get('category');
-    await this.setParams({ ...this.initState().params, ...validParams, ...newParams }, true, isModal);
+    await this.setParams({ ...this.initState().params, ...validParams, ...newParams }, true);
   }
 
   /**
@@ -59,10 +58,10 @@ class CatalogState extends StoreModule {
    * Установка параметров и загрузка списка товаров
    * @param [newParams] {Object} Новые параметры
    * @param [replaceHistory] {Boolean} Заменить адрес (true) или новая запись в истории браузера (false)
-   * @param [isModal] {Boolean} Флаг, указывающий, что действие идет из модального окна
+   * @param [isURLSave] {Boolean} Сохранять параметры в адресную строку браузера
    * @returns {Promise<void>}
    */
-  async setParams(newParams = {}, replaceHistory = false, isModal = false) {
+  async setParams(newParams = {}, replaceHistory = false) {
     const params = { ...this.getState().params, ...newParams };
 
     // Установка новых параметров и признака загрузки
@@ -72,8 +71,7 @@ class CatalogState extends StoreModule {
       waiting: true,
     }, 'Установлены параметры каталога');
 
-    if (!isModal) {
-      console.log('this happen');
+    if (this.config.saveParamsInUrl) {
       // Сохранить параметры в адрес страницы
       let urlSearch = new URLSearchParams(exclude(params, this.initState().params)).toString();
       const url = window.location.pathname + (urlSearch ? `?${urlSearch}` : '') + window.location.hash;

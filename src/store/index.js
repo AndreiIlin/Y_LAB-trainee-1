@@ -42,7 +42,36 @@ class Store {
     // Возвращается функция для удаления добавленного слушателя
     return () => {
       this.listeners = this.listeners.filter(item => item !== listener);
+    };
+  }
+
+  /**
+   * Динамическое создание модуля хранилища
+   * @param name {String} Кастомное имя модуля
+   * @param moduleName {String} Имя модуля из импортируемого файла
+   * @param config {Object} Конфигурация модуля
+   * */
+
+  makeState(name, moduleName, config = {}) {
+    if (!this.actions[name]) {
+      if (!moduleName) moduleName = name;
+      if (!modules[moduleName]) throw new Error(`Not found store module "${moduleName}"`);
+      config = {
+        ...this.config.modules[moduleName] || {},
+        ...config,
+      };
+      this.actions[name] = new modules[moduleName](this, name, config);
+      this.state[name] = this.actions[name].initState();
     }
+  }
+
+  /**
+   * Удаление модуля хранилища
+   * @param name {String} Кастомное имя модуля
+   * */
+  removeState(name) {
+    delete this.state[name];
+    delete this.actions[name];
   }
 
   /**

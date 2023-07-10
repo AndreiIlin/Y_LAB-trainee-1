@@ -17,6 +17,7 @@
   },
   "basket.addMore": "Выбрать еще товар",
   "article.add": "Добавить",
+  "article.selected": "Добавить выделенные",
   "filter.reset": "Сбросить",
   "auth.title": "Вход",
   "auth.login": "Логин",

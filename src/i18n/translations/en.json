@@ -15,6 +15,7 @@
   },
   "basket.addMore": "Choose another article",
   "article.add": "Add",
+  "article.selected": "Add selected",
   "filter.reset": "Reset",
   "auth.title": "Sign In",
   "auth.login": "Login",

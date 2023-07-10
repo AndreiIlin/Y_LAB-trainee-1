@@ -22,8 +22,11 @@ function Modals() {
   return select.modals.map((modal, index) => {
     const OpenedModal = existingModals[modal.name];
     return (
-      <Modal key={index} onClose={modal.data.onClose} title={modal.data.title} labelClose={modal.data.labelClose}>
-        <OpenedModal />
+      <Modal
+        key={index} onClose={modal.data.onClose} title={modal.data.title}
+        labelClose={modal.data.labelClose}
+      >
+        <OpenedModal modalData={modal.data} />
       </Modal>
     );
   });

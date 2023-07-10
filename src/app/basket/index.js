@@ -7,8 +7,7 @@ import List from '@src/components/list';
 import BasketTotal from '@src/components/basket-total';
 import SideLayout from '@src/components/side-layout/index.js';
 
-function Basket() {
-
+function Basket({ modalData }) {
   const store = useStore();
 
   const { t } = useTranslate();
@@ -24,26 +23,23 @@ function Basket() {
     removeFromBasket: useCallback(_id => store.actions.basket.removeFromBasket(_id), [store]),
     // Закрытие модалки корзины
     closeModal: useCallback(() => {
-      store.actions.modals.close('basket');
-    }, [store]),
+      modalData.onClose();
+    }, [modalData]),
     // Открытие модалки каталога
-    openCatalogModal: useCallback(() => {
-      store.actions.modals.open({
+    openCatalogModal: useCallback(async () => {
+      const result = await store.actions.modals.open({
         name: 'catalog',
         data: {
           title: t('title'),
           labelClose: t('basket.close'),
-          onClose: () => store.actions.modals.close('catalog'),
-          onConfirm: (items) => {
-            if (!items.length) {
-              return;
-            }
-            store.actions.modals.close('add to basket');
-            store.actions.modals.close('catalog');
-            store.actions.basket.addToBasket(items)
-          },
-        }
-      })
+        },
+      });
+
+      if (!result || !result.length) {
+        return;
+      }
+
+      await store.actions.basket.addToBasket(result);
     }, [t]),
   };
 

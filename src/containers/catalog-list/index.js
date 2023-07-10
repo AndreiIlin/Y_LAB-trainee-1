@@ -10,11 +10,11 @@ import SideLayout from '@src/components/side-layout/index.js';
 import PropTypes from 'prop-types';
 
 function CatalogList({
-  isModal,
-  modalConfirmFn,
+  moduleName,
+  modalData,
 }) {
-
   const store = useStore();
+
   const { t } = useTranslate();
 
   const [selectedItems, setSelectedItems] = useState([]);
@@ -22,17 +22,17 @@ function CatalogList({
   const isSelectMode = !!selectedItems.length;
 
   const select = useSelector(state => ({
-    list: state.catalog.list,
-    page: state.catalog.params.page,
-    limit: state.catalog.params.limit,
-    count: state.catalog.count,
-    waiting: state.catalog.waiting,
+    list: state[moduleName]?.list || [],
+    page: state[moduleName]?.params.page || 1,
+    limit: state[moduleName]?.params.limit || 10,
+    count: state[moduleName]?.count || 0,
+    waiting: state[moduleName]?.waiting || false,
   }));
 
   const callbacks = {
-    // Открытие модального окна добавления товаров
-    addToBasketModalOpen: useCallback((items) => () => {
-      store.actions.modals.open({
+    // Открытие модального окна добавления товаров?
+    addToBasketModalOpen: useCallback((items) => async () => {
+      const result = await store.actions.modals.open({
         name: 'add to basket',
         data: {
           title: t('modals/addToBasket.title'),
@@ -40,26 +40,18 @@ function CatalogList({
           labelLast: t('modals/addToBasket.count.last'),
           labelClose: t('modals/addToBasket.cancel'),
           items,
-          onClose: () => store.actions.modals.close('add to basket'),
-          onConfirm: isModal ? modalConfirmFn : (items) => {
-            if (!items.length) {
-              return;
-            }
-            store.actions.modals.close('add to basket');
-            store.actions.basket.addToBasket(items);
-            setSelectedItems([]);
-          },
         },
       });
-    }, [t, store, isModal]),
-    // обработчик вызова функции из корзины
-    handleModalConfirmFn: useCallback((items) => () => {
-      modalConfirmFn(items);
-    }, [modalConfirmFn]),
+      if (!result || !result.length) {
+        return;
+      }
+      await store.actions.basket.addToBasket(result);
+      setSelectedItems([]);
+    }, [t, store]),
     // Пагинация
-    onPaginate: useCallback(page => store.actions.catalog.setParams({ page }, false, isModal), [store]),
+    onPaginate: useCallback(page => store.actions[moduleName].setParams({ page }), [store]),
     // генератор ссылки для пагинатора
-    makePaginatorLink: isModal ? () => {} : useCallback((page) => {
+    makePaginatorLink: useCallback((page) => {
       return `?${new URLSearchParams({
         page,
         limit: select.limit,
@@ -78,6 +70,20 @@ function CatalogList({
         return prev.filter(item => item._id !== _id);
       });
     }, []),
+    addSelectedItems: useCallback((items) => async () => {
+      const articles = items.map(item => ({
+        ...item,
+        count: 1,
+      }));
+
+      if (modalData) {
+        modalData.onClose(articles);
+      } else {
+        await store.actions.basket.addToBasket(articles);
+      }
+
+      setSelectedItems([]);
+    }, [modalData]),
   };
 
   const renders = {
@@ -86,11 +92,11 @@ function CatalogList({
       return (
         <Item
           item={item} onAdd={callbacks.addToBasketModalOpen([{
-            _id: item._id,
-            title: item.title,
-          }])} link={`/articles/${item._id}`}
+          _id: item._id,
+          title: item.title,
+        }])} link={`/articles/${item._id}`}
           labelAdd={t('article.add')} selectItem={callbacks.handleSelectItem(item._id, item.title)}
-          isSelectMode={isSelectMode} isItemSelected={isItemSelected}
+          isSelectMode={isSelectMode || !!modalData} isItemSelected={isItemSelected}
         />
       );
     }, [callbacks.addToBasketModalOpen, t, isSelectMode, selectedItems]),
@@ -100,8 +106,8 @@ function CatalogList({
     <Spinner active={select.waiting}>
       {isSelectMode && <SideLayout side={'end'} padding={'medium'}>
         <button
-          onClick={callbacks.addToBasketModalOpen(selectedItems)}
-        >Добавить выделенные
+          onClick={callbacks.addSelectedItems(selectedItems)}
+        >{t('article.selected')}
         </button>
       </SideLayout>}
       <List list={select.list} renderItem={renders.item} />
@@ -114,14 +120,11 @@ function CatalogList({
 }
 
 CatalogList.propTypes = {
-  isModal: PropTypes.bool,
-  modalConfirmFn: PropTypes.func,
+  moduleName: PropTypes.string,
 };
 
 CatalogList.defaultProps = {
-  isModal: false,
-  modalConfirmFn: () => {
-  },
+  moduleName: 'catalog',
 };
 
 export default memo(CatalogList);

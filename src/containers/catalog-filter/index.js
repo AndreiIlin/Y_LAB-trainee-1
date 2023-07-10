@@ -9,32 +9,32 @@ import treeToList from '@src/utils/tree-to-list';
 import listToTree from '@src/utils/list-to-tree';
 import PropTypes from 'prop-types';
 
-function CatalogFilter({ isModal }) {
+function CatalogFilter({ moduleName }) {
 
   const store = useStore();
 
   const select = useSelector(state => ({
-    sort: state.catalog.params.sort,
-    query: state.catalog.params.query,
-    category: state.catalog.params.category,
+    sort: state[moduleName]?.params.sort || 'order',
+    query: state[moduleName]?.params.query || '',
+    category: state[moduleName]?.params.category || '',
     categories: state.categories.list,
   }));
 
   const callbacks = {
     // Сортировка
-    onSort: useCallback(sort => store.actions.catalog.setParams({ sort }, false, isModal), [store]),
+    onSort: useCallback(sort => store.actions[moduleName].setParams({ sort }), [store]),
     // Поиск
-    onSearch: useCallback(query => store.actions.catalog.setParams({
+    onSearch: useCallback(query => store.actions[moduleName].setParams({
       query,
       page: 1,
-    }, false, isModal), [store]),
+    }), [store]),
     // Сброс
-    onReset: useCallback(() => store.actions.catalog.resetParams(), [store]),
+    onReset: useCallback(() => store.actions[moduleName].resetParams(), [store]),
     // Фильтр по категории
-    onCategory: useCallback(category => store.actions.catalog.setParams({
+    onCategory: useCallback(category => store.actions[moduleName].setParams({
       category,
       page: 1,
-    }, false, isModal), [store]),
+    }), [store]),
   };
 
   const options = {
@@ -86,11 +86,11 @@ function CatalogFilter({ isModal }) {
 }
 
 CatalogFilter.propTypes = {
-  isModal: PropTypes.bool,
+  moduleName: PropTypes.string,
 };
 
 CatalogFilter.defaultProps = {
-  isModal: false,
+  moduleName: 'catalog',
 };
 
 export default memo(CatalogFilter);
