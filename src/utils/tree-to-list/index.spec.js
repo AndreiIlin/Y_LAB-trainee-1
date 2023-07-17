@@ -1,4 +1,4 @@
-import treeToList from "./index";
+import treeToList from "./index.js";
 
 describe('treeToList', () => {
   test('test1', () => {

@@ -1,4 +1,4 @@
-import listToTree from "./index";
+import listToTree from "./index.js";
 
 describe('listToTree', () => {
   test('test1', () => {
