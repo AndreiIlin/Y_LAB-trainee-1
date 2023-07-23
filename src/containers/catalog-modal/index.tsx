@@ -17,13 +17,17 @@ function CatalogModal({ modalData }: CatalogModalProps) {
     store.makeState('catalog-modal', 'catalog', {
       saveParamsInUrl: false,
     });
-    return () => store.removeState('catalog-modal');
+    return () => {
+      store.removeState('catalog-modal');
+      store.actions.countries.resetState();
+    }
   }, []);
 
   useInit(async () => {
     await Promise.all([
       store.actions['catalog-modal'].initParams(store.actions['catalog-modal'].initState().params),
       store.actions.categories.load(),
+      store.actions.countries.resetState(),
     ]);
   }, [], true);
 

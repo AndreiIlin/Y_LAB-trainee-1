@@ -6,6 +6,7 @@ export interface IParams {
   sort: string;
   query: string;
   category: string;
+  countries: string;
 }
 
 export interface CatalogModuleState {
@@ -17,9 +18,4 @@ export interface CatalogModuleState {
 
 export interface CatalogConfig {
   saveParamsInUrl?: boolean;
-}
-
-export interface IOptions {
-  value: string;
-  title: string;
 }

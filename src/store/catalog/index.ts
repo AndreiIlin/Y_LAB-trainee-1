@@ -22,6 +22,7 @@ class CatalogState extends StoreModule<CatalogModuleState, CatalogConfig> {
         sort: 'order',
         query: '',
         category: '',
+        countries: '',
       },
       count: 0,
       waiting: false,
@@ -42,6 +43,7 @@ class CatalogState extends StoreModule<CatalogModuleState, CatalogConfig> {
     if (urlParams.has('sort')) validParams.sort = urlParams.get('sort') as IParams['sort'];
     if (urlParams.has('query')) validParams.query = urlParams.get('query') as IParams['query'];
     if (urlParams.has('category')) validParams.category = urlParams.get('category') as IParams['category'];
+    if (urlParams.has('countries')) validParams.countries = urlParams.get('countries') as IParams['countries'];
     await this.setParams({ ...this.initState().params, ...validParams, ...newParams }, true);
   }
 
@@ -91,10 +93,12 @@ class CatalogState extends StoreModule<CatalogModuleState, CatalogConfig> {
       sort: params.sort,
       'search[query]': params.query,
       'search[category]': params.category,
+      'search[madeIn]': params.countries,
     }, {
       skip: 0,
       'search[query]': '',
       'search[category]': '',
+      'search[madeIn]': '',
     });
 
     const res = await this.services.api.request<MultiDataApiResponseWithCount<IArticle>>({ url: `/api/v1/articles?${new URLSearchParams(apiParams)}` });

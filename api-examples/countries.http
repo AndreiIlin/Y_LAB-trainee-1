@@ -1,0 +1,14 @@
+###
+# Список стран
+
+GET http://example.front.ylab.io/api/v1/countries?fields=_id,title,code&limit=*
+
+###
+# Список стран с пагинацией
+
+http://example.front.ylab.io/api/v1/countries?fields=_id,title,code&limit=10&skip=10
+
+###
+# Список стран с поиском
+
+http://example.front.ylab.io/api/v1/countries?fields=_id,title,code&limit=10&skip=0&search[query]=фра

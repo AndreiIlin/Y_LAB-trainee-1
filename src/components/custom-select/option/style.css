@@ -1,0 +1,55 @@
+.CustomSelect-option {
+  padding: 6px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.CustomSelect-option:hover {
+  cursor: pointer;
+  background-color: #DBDFFF;
+}
+
+.CustomSelect-option_active {
+  cursor: pointer;
+  background-color: #DBDFFF;
+}
+
+
+.CustomSelect-option_selected {
+  background-color: #808DFF;
+}
+
+.CustomSelect-option_selected:hover {
+  background-color: #808DFF;
+}
+
+.CustomSelect-option-avatar {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #6F7EFF;
+  border-radius: 3px;
+  color: #FFF;
+  font-size: 8px;
+  font-weight: 700;
+}
+
+.CustomSelect-option-title {
+  padding: 0;
+  flex-grow: 1;
+  text-align: start;
+  border: none;
+  background-color: transparent;
+  font-size: 15px;
+  font-weight: 400;
+  color: #191F4D;
+}
+
+.CustomSelect-option-title_selected {
+  color: #FFFFFF;
+}

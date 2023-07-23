@@ -1,0 +1,74 @@
+.CustomSelect {
+  width: 240px;
+  position: relative;
+}
+
+.CustomSelect-dropdown-selected {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-grow: 1;
+  gap: 10px;
+  overflow-x: scroll;
+}
+
+.CustomSelect-dropdown-selected-item{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.CustomSelect-dropdown {
+  padding: 6px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.CustomSelect-dropdown-avatar {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #6F7EFF;
+  border-radius: 3px;
+  color: #FFF;
+  font-size: 8px;
+  font-weight: 700;
+}
+
+.CustomSelect-dropdown-title {
+  padding: 0;
+  text-align: start;
+  border: none;
+  background-color: transparent;
+  font-size: 15px;
+  font-weight: 400;
+  color: #191F4D;
+  white-space: nowrap;
+}
+
+.CustomSelect-dropdown-toggle {
+  transition: all 0.3s ease-in-out;
+  cursor: pointer;
+}
+
+.CustomSelect-dropdown-toggle_opened {
+  transform: rotate(180deg);
+}
+
+.CustomSelect-menu {
+  position: absolute;
+  left: 0;
+  width: 230px;
+  padding: 5px;
+  background: #FFFFFF;
+  box-shadow: 0px 8px 8px 0px rgba(60, 60, 63, 0.25);
+}

@@ -6,18 +6,29 @@
 //  * @param [result] {Array} Результат функции (используется рекурсией).
 //  * @returns {Array} Корневые узлы
 //  */
-export default function treeToList(
-  tree: any,
-  callback: (item: any, level: number) => any,
+
+type ResultType<Initial, Changed> = Changed extends null ? Initial : Changed;
+
+export default function treeToList<
+  Initial extends { children: Initial[] },
+  Changed = null
+>(
+  tree: Initial[],
+  callback?: (item: Initial, level: number) => Changed,
   level = 0,
-  prevResult: any = [],
-) {
-  const result = prevResult;
+  prevResult: ResultType<Initial, Changed>[] = []
+): ResultType<Initial, Changed>[] {
+  const result: ResultType<Initial, Changed>[] = prevResult;
   for (const item of tree) {
-    result.push(callback ? callback(item, level) : item);
+    const currentItem = callback ? callback(item, level) : (item as any);
+    result.push(currentItem as ResultType<Initial, Changed>);
     if (item.children?.length) {
       treeToList(item.children, callback, level + 1, result);
     }
   }
   return result;
 }
+
+
+
+

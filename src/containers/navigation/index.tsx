@@ -35,7 +35,10 @@ function Navigation() {
 
     // Обработка перехода на главную
     onNavigate: useCallback(async (item: INavigationMenuOption) => {
-      if (item.key === 1) await store.actions.catalog.resetParams();
+      if (item.key === 1) {
+        await store.actions.catalog.resetParams();
+        await store.actions.countries.resetState();
+      }
     }, [store]),
   };
 

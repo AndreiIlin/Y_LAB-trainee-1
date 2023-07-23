@@ -1,0 +1,21 @@
+.CustomSelect-options-list {
+  position: relative;
+  max-height: 123px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  overflow: scroll;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+}
+
+.CustomSelect-options-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.CustomSelect-options-list::-webkit-scrollbar-thumb {
+  background-color: #E5E6E9;
+  border-radius: 5px;
+  height: 60px;
+}
+

@@ -5,33 +5,47 @@
 //  * @returns {Array} Корневые узлы
 //  */
 
-export default function listToTree(list: any, key = '_id') {
-  const trees: any = {};
-  const roots: any = {};
+interface IParent {
+  parent: {
+    _id: string;
+  } | null;
+}
+
+interface IChild<T> {
+  children: T[];
+}
+
+export default function listToTree<
+  Initial extends IParent,
+  Result extends IChild<Result>,
+  K extends keyof Initial & string // Ensure K is a string key of Initial
+>(list: Initial[], key: K): Result[] {
+  const trees: Record<string, Result> = {};
+  const roots: Record<string, Result> = {};
+
   for (const item of list) {
-    // Добавление элемента в индекс узлов и создание свойства children
-    if (!trees[item[key]]) {
-      trees[item[key]] = item;
-      trees[item[key]].children = [];
-      // Ещё никто не ссылался, поэтому пока считаем корнем
-      roots[item[key]] = trees[item[key]];
+    const itemKey = item[key] as string;
+    if (!trees[itemKey]) {
+      trees[itemKey] = item as unknown as Result;
+      trees[itemKey].children = [];
+      roots[itemKey] = trees[itemKey];
     } else {
-      trees[item[key]] = Object.assign(trees[item[key]], item);
+      trees[itemKey] = Object.assign(trees[itemKey], item);
     }
 
-    // Если элемент имеет родителя, то добавляем его в подчиненные родителя
     if (item.parent?._id) {
-      // Если родителя ещё нет в индексе, то индекс создаётся, ведь _id родителя известен
-      if (!trees[item.parent._id]) {
-        trees[item.parent[key]] = { children: [] };
+      const parentKey = item.parent._id as string;
+      if (!trees[parentKey]) {
+        trees[parentKey] = { children: [] } as unknown as Result;
       }
-      // Добавления в подчиненные родителя
-      trees[item.parent[key]].children.push(trees[item[key]]);
-      // Так как элемент добавлен к родителю, то он уже не является корневым
-      if (roots[item[key]]) {
-        delete roots[item[key]];
+      trees[parentKey].children.push(trees[itemKey]);
+      if (roots[itemKey]) {
+        delete roots[itemKey];
       }
     }
   }
+
   return Object.values(roots);
 }
+
+

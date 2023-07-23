@@ -1,9 +1,12 @@
 import Input from '@src/components/input';
 import Select from '@src/components/select';
 import SideLayout from '@src/components/side-layout';
+import { IFilterOption } from '@src/containers/catalog-filter/types';
+import CountriesSelect from '@src/containers/countries-select';
 import useSelector from '@src/hooks/use-selector';
 import useStore from '@src/hooks/use-store';
 import useTranslate from '@src/hooks/use-translate';
+import { ICategoryWithChildren } from '@src/store/categories/types';
 import { StoreCustomActionName } from '@src/store/types';
 import listToTree from '@src/utils/list-to-tree';
 import treeToList from '@src/utils/tree-to-list';
@@ -34,7 +37,10 @@ function CatalogFilter({ moduleName = 'catalog' }: CatalogFilterProps) {
       page: 1,
     }), [store]),
     // Сброс
-    onReset: useCallback(() => store.actions[moduleName].resetParams(), [store]),
+    onReset: useCallback(async () => {
+      await store.actions[moduleName].resetParams();
+      await store.actions.countries.resetState();
+    }, [store]),
     // Фильтр по категории
     onCategory: useCallback((category: string) => store.actions[moduleName].setParams({
       category,
@@ -43,7 +49,7 @@ function CatalogFilter({ moduleName = 'catalog' }: CatalogFilterProps) {
   };
 
   const options = {
-    sort: useMemo(() => ([
+    sort: useMemo((): IFilterOption[] => ([
       {
         value: 'order',
         title: 'По порядку',
@@ -61,12 +67,12 @@ function CatalogFilter({ moduleName = 'catalog' }: CatalogFilterProps) {
         title: 'Древние',
       },
     ]), []),
-    categories: useMemo(() => ([
+    categories: useMemo((): IFilterOption[] => ([
       {
         value: '',
         title: 'Все',
       },
-      ...treeToList(listToTree(select.categories), (item, level) => (
+      ...treeToList<ICategoryWithChildren, IFilterOption>(listToTree(select.categories, '_id'), (item, level) => (
         {
           value: item._id,
           title: '- '.repeat(level) + item.title,
@@ -74,13 +80,13 @@ function CatalogFilter({ moduleName = 'catalog' }: CatalogFilterProps) {
       )),
     ]), [select.categories]),
   };
-
   const { t } = useTranslate();
 
   return (
     <SideLayout padding="medium">
       <Select options={options.categories} value={select.category} onChange={callbacks.onCategory} />
       <Select options={options.sort} value={select.sort} onChange={callbacks.onSort} />
+      <CountriesSelect moduleName={moduleName} />
       <Input
         value={select.query} onChange={callbacks.onSearch} placeholder={'Поиск'}
         delay={1000} name={'filter-input'}
